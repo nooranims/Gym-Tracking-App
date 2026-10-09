@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GymFit Pro — Downtown Athletic Club</title>
+  <meta name="theme-color" content="#0284c7">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/png" href="icon-192.png">
+</head>
+<body>
+  <div class="app-layout">
+    
+    <!-- ========================================================
+         LEFT SIDEBAR (STITCH UI RAIL)
+         ======================================================== -->
+    <aside class="app-sidebar">
+      <div class="sidebar-top">
+        <!-- Logo -->
+        <div class="sidebar-brand" onclick="app.switchMainTab('measurements')">
+          <div class="sidebar-brand-icon">🏋️</div>
+          <div class="sidebar-brand-text">
+            <h1>GymFit Pro</h1>
+            <p>Downtown Athletic Club</p>
+          </div>
+        </div>
+
+        <!-- Quick Check-In CTA Button -->
+        <button class="btn-sidebar-quick" onclick="app.openQuickCheckinModal()" title="Fast client check-in">
+          <span>⚡</span>
+          <span>Quick Check-In</span>
+        </button>
+
+        <!-- Navigation Menu -->
+        <nav class="sidebar-nav">
+          <div class="sidebar-nav-item" id="side-nav-dashboard" onclick="app.switchMainTab('measurements')">
+            <div class="sidebar-nav-item-left">
+              <span class="sidebar-nav-item-icon">📊</span>
+              <span>Dashboard</span>
+            </div>
+          </div>
+
+          <div class="sidebar-nav-item active" id="side-nav-members" onclick="app.switchMainTab('measurements')">
+            <div class="sidebar-nav-item-left">
+              <span class="sidebar-nav-item-icon">👥</span>
+              <span>Members</span>
+            </div>
+          </div>
+
+          <div class="sidebar-nav-item" id="side-nav-accounts" onclick="app.switchMainTab('accounts')">
+            <div class="sidebar-nav-item-left">
+              <span class="sidebar-nav-item-icon">💰</span>
+              <span>Accounts & Fees</span>
+            </div>
+            <span class="sidebar-badge" id="side-dues-badge" style="display: none;">Dues</span>
+          </div>
+
+          <div class="sidebar-nav-item" id="side-nav-attendance" onclick="app.switchMainTab('attendance')">
+            <div class="sidebar-nav-item-left">
+              <span class="sidebar-nav-item-icon">📅</span>
+              <span>Attendance</span>
+            </div>
+          </div>
+
+          <div class="sidebar-nav-item" onclick="app.openSpotlight()">
+            <div class="sidebar-nav-item-left">
+              <span class="sidebar-nav-item-icon">📈</span>
+              <span>Telemetry</span>
+            </div>
+            <span class="sidebar-badge" id="side-telemetry-badge">Dues</span>
+          </div>
+
+          <div class="sidebar-nav-item" onclick="app.openFirebaseModal()">
+            <div class="sidebar-nav-item-left">
+              <span class="sidebar-nav-item-icon">☁️</span>
+              <span>Cloud Database</span>
+            </div>
+            <span class="sidebar-badge" id="side-cloud-badge" style="background:#e0f2fe; color:#0369a1;">Firebase</span>
+          </div>
+
+          <div class="sidebar-nav-item" onclick="app.openBackupModal()">
+            <div class="sidebar-nav-item-left">
+              <span class="sidebar-nav-item-icon">⚙️</span>
+              <span>Settings</span>
+            </div>
+          </div>
+        </nav>
+      </div>
+
+      <!-- Sidebar Bottom -->
+      <div class="sidebar-bottom">
+        <div class="sidebar-nav-item" id="sidebar-install-item" onclick="app.directInstallApp()">
+          <div class="sidebar-nav-item-left">
+            <span class="sidebar-nav-item-icon">⚡</span>
+            <span style="font-weight: 700; color: var(--brand-blue);">Install Web App</span>
+          </div>
+        </div>
+        <div class="sidebar-nav-item" onclick="app.openBackupModal()">
+          <div class="sidebar-nav-item-left">
+            <span class="sidebar-nav-item-icon">💾</span>
+            <span>Backup Data</span>
+          </div>
+        </div>
+        <div class="sidebar-nav-item" onclick="app.resetToInitialDataset()">
+          <div class="sidebar-nav-item-left">
+            <span class="sidebar-nav-item-icon">🚪</span>
+            <span>Reset Demo</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ========================================================
+         RIGHT MAIN AREA
+         ======================================================== -->
+    <div class="app-main">
+      
+      <!-- TOP HEADER BAR (STITCH EXACT) -->
+      <header class="top-header">
+        <div class="top-header-left">
+          <!-- Search with Ctrl+K trigger -->
+          <div class="header-search-wrap" onclick="app.openSpotlight()">
+            <span class="header-search-icon">🔍</span>
+            <input type="text" placeholder="Search members, IDs, phone..." readonly>
+            <span class="header-search-kbd">⌘K</span>
+          </div>
+
+          <!-- Live Status Chips -->
+          <div class="header-status-chips">
+            <div class="header-chip green">
+              <span class="header-chip-dot"></span>
+              <span>Active Members: <b id="header-chip-members">119</b></span>
+            </div>
+            <div class="header-chip blue">
+              <span class="header-chip-dot"></span>
+              <span>Today's Sessions: <b id="header-chip-sessions">935</b></span>
+            </div>
+            <div class="header-chip red">
+              <span class="header-chip-dot"></span>
+              <span>Overdue Dues: <b id="header-chip-dues">Rs. 0</b></span>
+            </div>
+            <div class="header-chip" id="header-firebase-status-pill" onclick="app.openFirebaseModal()" style="cursor: pointer;" title="Click to manage Firebase Cloud Database">
+              <span class="header-chip-dot" id="header-firebase-dot" style="background: #0284c7;"></span>
+              <span id="header-firebase-status-text">Cloud Sync</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Header Right Actions -->
+        <div class="top-header-right">
+          <button class="btn-header-add" onclick="app.openAddClientModal()">
+            <span>➕</span>
+            <span>Add Member</span>
+          </button>
+          <button class="btn-header-install" id="btn-install-app" onclick="app.directInstallApp()" title="Direct 1-Click Install Web App">
+            <span>⚡</span>
+            <span>Direct Install App</span>
+          </button>
+          <button class="header-icon-btn" onclick="app.switchMainTab('accounts')" title="Notifications">
+            <span>🔔</span>
+            <span class="header-icon-badge" id="header-notif-badge"></span>
+          </button>
+          <button class="header-icon-btn" onclick="app.openBackupModal()" title="Help & System Info">
+            <span>❓</span>
+          </button>
+          <div class="header-user-profile" onclick="app.openBackupModal()">
+            <div class="header-user-avatar">TM</div>
+            <div class="header-user-info">
+              <div class="header-user-name">Alex Mercer</div>
+              <div class="header-user-role">Floor Manager</div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- CONTENT CONTAINER -->
+      <div class="content-container">
+        
+        <!-- View Tabs Bar -->
+        <div class="content-tabs-bar">
+          <div class="content-tab-item active" id="tab-btn-measurements" onclick="app.switchMainTab('measurements')">
+            <span>Directory & Measurements</span>
+            <span class="content-tab-badge" id="tab-members-badge">119</span>
+          </div>
+          <div class="content-tab-item" id="tab-btn-accounts" onclick="app.switchMainTab('accounts')">
+            <span>Accounts & Fees</span>
+            <span class="content-tab-badge" id="tab-accounts-badge" style="background:#fee2e2; color:#b91c1c;">0 Dues</span>
+          </div>
+          <div class="content-tab-item" id="tab-btn-attendance" onclick="app.switchMainTab('attendance')">
+            <span>Daily Attendance</span>
+            <span class="content-tab-badge" id="tab-attendance-badge">0 Today</span>
+          </div>
+        </div>
+
+        <!-- ========================================================
+             VIEW 1: DIRECTORY & MEASUREMENTS (IMAGE 4)
+             ======================================================== -->
+        <section id="view-measurements">
+          <!-- Filter pills & View toggles -->
+          <div class="directory-controls">
+            <div class="volume-pills">
+              <button class="vol-pill active" onclick="app.filterByVolume('ALL')">All (<span id="count-all">119</span>)</button>
+              <button class="vol-pill" onclick="app.filterByVolume('Vol 1')">Vol 1</button>
+              <button class="vol-pill" onclick="app.filterByVolume('Vol 2')">Vol 2</button>
+              <button class="vol-pill" onclick="app.filterByVolume('Vol 3')">Vol 3</button>
+              <button class="vol-pill" onclick="app.filterByVolume('Vol 4')">Vol 4</button>
+              <button class="vol-pill pill-dues" onclick="app.filterByVolume('HAS_DUES')">Pending Dues (<span id="count-dues-pill">0</span>)</button>
+            </div>
+
+            <div class="view-toggle-wrap">
+              <button class="view-toggle-btn active" id="view-toggle-grid" onclick="app.setViewMode('cards')" title="Card Grid View">⊞</button>
+              <button class="view-toggle-btn" id="view-toggle-table" onclick="app.setViewMode('table')" title="Dense Table View">☰</button>
+            </div>
+          </div>
+
+          <!-- Cards Grid (Image 4 exact) -->
+          <div class="member-cards-grid" id="clients-cards-container"></div>
+
+          <!-- Table View (Hidden by default) -->
+          <div class="directory-table-card" id="clients-table-container" style="display: none;">
+            <table class="modern-table">
+              <thead>
+                <tr>
+                  <th>Member Name</th>
+                  <th>Register Folio</th>
+                  <th>Sessions</th>
+                  <th>Latest Weight</th>
+                  <th>Net Delta</th>
+                  <th>Latest Waist</th>
+                  <th>Latest Hip</th>
+                  <th>Admission Validity</th>
+                  <th>Fee Status</th>
+                  <th>Latest Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="clients-table-body"></tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Bar -->
+          <div class="pagination-bar" id="directory-pagination">
+            <div class="pagination-info" id="showing-clients-count">Showing 1 to 12 of 119 members</div>
+            <div class="pagination-controls" id="pagination-buttons"></div>
+          </div>
+        </section>
+
+        <!-- ========================================================
+             VIEW 2: ACCOUNTS & FEE COLLECTION ENGINE (IMAGE 3)
+             ======================================================== -->
+        <section id="view-accounts" style="display: none;">
+          <div class="accounts-header-banner">
+            <div>
+              <div class="breadcrumbs">Accounts &gt; <span>Billing &amp; Fee Operations</span></div>
+              <h2 class="section-title">Accounts &amp; Fee Collection</h2>
+            </div>
+            <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); background: #ffffff; padding: 0.4rem 0.85rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+              📅 Fiscal Cycle: <span style="color: var(--brand-blue);">Q4 2026 · Current</span>
+            </div>
+          </div>
+
+          <!-- 4 KPI Cards Grid (Image 3) -->
+          <div class="kpi-cards-grid-4">
+            <!-- 1. Total Lifetime Revenue -->
+            <div class="kpi-stat-card">
+              <div class="kpi-stat-top">
+                <span class="kpi-stat-label">Total Lifetime Revenue</span>
+                <div class="kpi-stat-icon-wrap blue">💳</div>
+              </div>
+              <div class="kpi-stat-value" id="kpi-total-revenue">Rs. 0</div>
+              <div class="kpi-stat-sub">
+                <span style="color: var(--accent-success); font-weight: 700;">↗ +12.4%</span> vs last quarter
+              </div>
+            </div>
+
+            <!-- 2. This Month's Revenue -->
+            <div class="kpi-stat-card">
+              <div class="kpi-stat-top">
+                <span class="kpi-stat-label">This Month's Revenue</span>
+                <div class="kpi-stat-icon-wrap cyan">💵</div>
+              </div>
+              <div class="kpi-stat-value" id="kpi-month-revenue">Rs. 0</div>
+              <div>
+                <div class="kpi-stat-sub" style="justify-content: space-between;">
+                  <span>Target: Rs. 300,000</span>
+                  <span id="kpi-month-percent" style="font-weight: 700;">82%</span>
+                </div>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar-fill" id="kpi-month-progress-bar" style="width: 82%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Total Outstanding Dues -->
+            <div class="kpi-stat-card">
+              <div class="kpi-stat-top">
+                <span class="kpi-stat-label">Total Outstanding Dues</span>
+                <div class="kpi-stat-icon-wrap red">⚠️</div>
+              </div>
+              <div class="kpi-stat-value red" id="kpi-total-dues">Rs. 0</div>
+              <div class="kpi-stat-sub">
+                <span style="color: var(--accent-danger); font-weight: 700;">●</span>
+                <span id="kpi-dues-clients-count">0 Members Pending</span>
+              </div>
+            </div>
+
+            <!-- 4. Expired Admissions -->
+            <div class="kpi-stat-card">
+              <div class="kpi-stat-top">
+                <span class="kpi-stat-label">Expired Admissions</span>
+                <div class="kpi-stat-icon-wrap amber">📅</div>
+              </div>
+              <div class="kpi-stat-value" id="kpi-expired-admissions">0 Members</div>
+              <div class="kpi-stat-sub">
+                <span style="color: var(--brand-blue); font-weight: 700;">●</span>
+                <span>3-Month Validity Cycle</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Split Layout: Ledger vs Fast Record -->
+          <div class="accounts-split-layout">
+            
+            <!-- Left: Master Financial Ledger (Image 3) -->
+            <div class="ledger-card-panel">
+              <div class="ledger-header">
+                <div class="ledger-title">
+                  <h3>Master Financial Ledger</h3>
+                  <p>Real-time payment logs and individual member dues</p>
+                </div>
+                <div class="ledger-actions">
+                  <select class="form-control" id="accounts-filter-dues-only" onchange="app.handleAccountsDuesFilter(this.value)" style="padding: 0.35rem 0.65rem; font-size: 0.78rem;">
+                    <option value="ALL">All Transactions</option>
+                    <option value="DUES" selected>Pending Dues Only</option>
+                  </select>
+                  <button class="btn-card-action btn-card-profile" onclick="app.exportAccountsLedgerCSV()" style="padding: 0.4rem 0.75rem;">
+                    <span>📥 Export CSV</span>
+                  </button>
+                </div>
+              </div>
+
+              <div style="overflow-x: auto;">
+                <table class="modern-table">
+                  <thead>
+                    <tr>
+                      <th>Receipt #</th>
+                      <th>Date &amp; Time</th>
+                      <th>Member &amp; Register ID</th>
+                      <th>Fee Type</th>
+                      <th>Amount Paid</th>
+                      <th>Dues Left</th>
+                      <th>Payment Mode</th>
+                    </tr>
+                  </thead>
+                  <tbody id="master-payments-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Right: Fee Collection Fast Record (Image 3) -->
+            <div class="fast-record-card">
+              <div class="fast-record-header">
+                <div>
+                  <h3>Fee Collection Fast Record</h3>
+                  <p>Rapid desk entry &amp; instant receipt generation</p>
+                </div>
+                <span style="font-size: 1.2rem;">📋</span>
+              </div>
+
+              <!-- Member Selection Card -->
+              <div class="form-group">
+                <label>Member Selection</label>
+                <div class="fast-member-card">
+                  <div style="display: flex; align-items: center; gap: 0.65rem;">
+                    <div class="member-card-avatar" id="fast-record-avatar" style="width: 38px; height: 38px; font-size: 0.85rem;">TM</div>
+                    <div>
+                      <select id="fast-record-client-select" class="form-control" style="font-weight: 700; border: none; padding: 0; background: transparent; font-size: 0.95rem;" onchange="app.handleFastRecordClientChange(this.value)"></select>
+                      <div style="font-size: 0.7rem; color: var(--text-muted);" id="fast-record-member-sub">Vol 2 · Page 48 · ID #GP-8492</div>
+                    </div>
+                  </div>
+                  <span class="status-pill active" id="fast-record-status-pill">Active Member</span>
+                </div>
+              </div>
+
+              <!-- Fee Structure 2x2 Pills -->
+              <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <label>Fee Structure Type</label>
+                  <span style="font-size: 0.7rem; color: var(--text-dim);">Select one</span>
+                </div>
+                <div class="fee-structure-grid">
+                  <div class="fee-structure-pill" id="pill-fee-monthly" onclick="app.selectFastFeeType('monthly', 3000)">
+                    <div class="fee-pill-name">Monthly Fee</div>
+                    <div class="fee-pill-price">Rs. 3,000</div>
+                  </div>
+                  <div class="fee-structure-pill" id="pill-fee-admission" onclick="app.selectFastFeeType('admission', 2000)">
+                    <div class="fee-pill-name">Admission Fee</div>
+                    <div class="fee-pill-price">Rs. 2,000</div>
+                  </div>
+                  <div class="fee-structure-pill selected" id="pill-fee-combined" onclick="app.selectFastFeeType('combined', 5000)">
+                    <div class="fee-pill-name">Adm + Monthly ✓</div>
+                    <div class="fee-pill-price">Rs. 5,000</div>
+                  </div>
+                  <div class="fee-structure-pill" id="pill-fee-custom" onclick="app.selectFastFeeType('custom', 3000)">
+                    <div class="fee-pill-name">Custom Entry</div>
+                    <div class="fee-pill-price">Variable</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Dual Inputs: Charged vs Collected -->
+              <div class="amount-inputs-grid">
+                <div class="input-field-group">
+                  <label>Amount Charged</label>
+                  <input type="number" id="fast-amount-charged" value="5000" step="100" oninput="app.calculateFastFeeDues()">
+                </div>
+                <div class="input-field-group">
+                  <label>Amount Collected</label>
+                  <input type="number" id="fast-amount-collected" value="2000" step="100" oninput="app.calculateFastFeeDues()" style="border-color: var(--brand-blue); color: var(--brand-blue);">
+                </div>
+              </div>
+
+              <!-- Remaining Dues Alert Box -->
+              <div class="remaining-dues-box">
+                <div class="remaining-dues-box-left">
+                  <span>⚠️</span>
+                  <span>Remaining Dues:<br><small style="font-weight: 500; font-size: 0.68rem; color: var(--text-muted);">Will update ledger balance</small></span>
+                </div>
+                <div class="remaining-dues-box-amount" id="fast-remaining-dues-display">Rs. 3,000</div>
+              </div>
+
+              <!-- Payment Mode & 3-Month Extension -->
+              <div class="amount-inputs-grid">
+                <div class="input-field-group">
+                  <label>Payment Mode</label>
+                  <select id="fast-payment-method" class="form-control">
+                    <option value="Cash">Cash</option>
+                    <option value="JazzCash / EasyPaisa">JazzCash / EasyPaisa</option>
+                    <option value="Bank Transfer">Bank Transfer</option>
+                  </select>
+                </div>
+                <div class="input-field-group">
+                  <label>3-Month Expiry</label>
+                  <div style="font-size: 0.78rem; font-weight: 700; color: var(--brand-blue); padding: 0.55rem; background: var(--bg-card-subtle); border-radius: var(--radius-md); border: 1px solid var(--border-color);" id="fast-new-expiry-date">
+                    Auto-Extends +3 Mo
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action Button -->
+              <button class="btn-attendance-large" style="width: 100%; margin-top: 0.25rem;" onclick="app.submitFastRecordFee()">
+                <span>💰</span>
+                <span>Save Receipt &amp; Record Payment</span>
+              </button>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ========================================================
+             VIEW 3: DAILY MEMBER ATTENDANCE (IMAGE 2)
+             ======================================================== -->
+        <section id="view-attendance" style="display: none;">
+          <div class="attendance-header-banner">
+            <div class="attendance-title-wrap">
+              <h2 class="section-title">
+                Daily Member Attendance
+                <span class="attendance-live-badge">Live Station Active</span>
+              </h2>
+              <p style="font-size: 0.8rem; color: var(--text-muted);">Real-time biometric &amp; manual admission ledger for today's active training sessions.</p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <div style="background: #ffffff; border: 1px solid var(--border-color); padding: 0.45rem 0.85rem; border-radius: var(--radius-md); font-size: 0.8rem; font-weight: 700;">
+                📅 <span id="attendance-station-today-date">October 2026</span>
+              </div>
+              <button class="btn-card-action btn-card-profile" onclick="app.openBackupModal()" style="padding: 0.45rem 0.85rem;">
+                <span>💾 Backup &amp; Export</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 4 Attendance KPI Stat Cards (Image 2) -->
+          <div class="kpi-cards-grid-4">
+            <!-- 1. Total Check-Ins -->
+            <div class="kpi-stat-card">
+              <div class="kpi-stat-top">
+                <span class="kpi-stat-label">Today's Total Check-Ins</span>
+                <div class="kpi-stat-icon-wrap blue">👥</div>
+              </div>
+              <div class="kpi-stat-value"><span id="att-kpi-total">0</span> <span style="font-size: 0.95rem; font-weight: 600; color: var(--text-muted);">/ 119 Target</span></div>
+              <div>
+                <div class="kpi-stat-sub" style="justify-content: space-between;">
+                  <span>Occupancy Load</span>
+                  <span id="att-kpi-percent" style="font-weight: 700;">0%</span>
+                </div>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar-fill" id="att-kpi-occupancy-bar" style="width: 0%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Peak Window -->
+            <div class="kpi-stat-card">
+              <div class="kpi-stat-top">
+                <span class="kpi-stat-label">Current Peak Window</span>
+                <div class="kpi-stat-icon-wrap cyan">⏱️</div>
+              </div>
+              <div class="kpi-stat-value" style="font-size: 1.35rem;">6:00 PM – 8:30 PM</div>
+              <div class="kpi-stat-sub">
+                <span style="color: var(--accent-danger); font-weight: 700;">●</span>
+                <span>High capacity forecast (85% rack utilization)</span>
+              </div>
+            </div>
+
+            <!-- 3. Morning Session -->
+            <div class="kpi-stat-card">
+              <div class="kpi-stat-top">
+                <span class="kpi-stat-label">Morning Session</span>
+                <div class="kpi-stat-icon-wrap amber">☀️</div>
+              </div>
+              <div class="kpi-stat-value"><span id="att-kpi-morning">0</span> <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">completed</span></div>
+              <div class="kpi-stat-sub">
+                <span style="color: var(--accent-success); font-weight: 700;">✓</span>
+                <span>Normal volume · Concluded at 11:30 AM</span>
+              </div>
+            </div>
+
+            <!-- 4. Evening Session -->
+            <div class="kpi-stat-card">
+              <div class="kpi-stat-top">
+                <span class="kpi-stat-label">Evening Session</span>
+                <div class="kpi-stat-icon-wrap blue">📈</div>
+              </div>
+              <div class="kpi-stat-value"><span id="att-kpi-evening">0</span> <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">logged now</span></div>
+              <div class="kpi-stat-sub">
+                <span style="color: var(--accent-success); font-weight: 700;">↗ +18.4%</span> vs yesterday evening
+              </div>
+            </div>
+          </div>
+
+          <!-- Fast Member Lookup & Check-In Bar (Image 2) -->
+          <div class="attendance-fast-bar">
+            <div class="attendance-fast-row">
+              <div>
+                <label style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.35rem; display: block;">Fast Member Lookup</label>
+                <select id="attendance-station-client-select" class="form-control" style="font-weight: 700; font-size: 0.95rem;"></select>
+              </div>
+
+              <div>
+                <label style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.35rem; display: block;">Plan &amp; Register Tier</label>
+                <div class="fast-tier-pill">
+                  <span id="fast-tier-label">Volume 1 · General Pass</span>
+                  <span style="color: var(--accent-success);">● Active</span>
+                </div>
+              </div>
+
+              <div>
+                <label style="font-size: 0.72rem; font-weight: 700; color: transparent; margin-bottom: 0.35rem; display: block;">Action</label>
+                <button class="btn-attendance-large" style="width: 100%;" onclick="app.checkinSelectedStationMember()">
+                  <span>✅</span>
+                  <span>Check-In Member Today [Spacebar]</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="duplicate-guard-text">
+              <span>🛡️ Duplicate Guard Active: Prevents multiple check-ins within an 8-hour window automatically.</span>
+              <span style="color: var(--brand-blue); cursor: pointer;" onclick="app.openQuickCheckinModal()">Search Full Directory ↗</span>
+            </div>
+          </div>
+
+          <!-- Live Ledger Table (Image 2) -->
+          <div class="ledger-card-panel">
+            <div class="ledger-header">
+              <div class="ledger-title">
+                <h3>Live Ledger <small style="font-weight: 500; font-size: 0.75rem; color: var(--text-muted);">Updated just now</small></h3>
+              </div>
+              <div class="volume-pills">
+                <button class="vol-pill active" id="att-filter-all" onclick="app.filterAttendanceLedger('ALL')">All (<span id="att-count-all">0</span>)</button>
+                <button class="vol-pill" id="att-filter-evening" onclick="app.filterAttendanceLedger('EVENING')">Evening (<span id="att-count-evening">0</span>)</button>
+                <button class="vol-pill pill-dues" id="att-filter-dues" onclick="app.filterAttendanceLedger('DUES')">Dues Alert (<span id="att-count-dues">0</span>)</button>
+              </div>
+            </div>
+
+            <div style="overflow-x: auto;">
+              <table class="modern-table">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Member Identity &amp; Register Folio</th>
+                    <th>Admission Validity</th>
+                    <th>Fee / Account Status</th>
+                    <th>Monthly Sessions</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="attendance-station-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       CLIENT PROFILE & MEASUREMENT MODAL (IMAGE 1 EXACT)
+       ======================================================== -->
+  <div class="modal-overlay" id="measurement-modal-overlay">
+    <div class="profile-full-modal">
+      
+      <!-- Top Banner (Image 1) -->
+      <div class="profile-modal-header">
+        <div class="profile-header-left">
+          <div class="profile-header-avatar" id="modal-client-avatar">TM</div>
+          <div class="profile-header-title-wrap">
+            <div class="profile-header-top-line">
+              <div class="profile-header-name" id="modal-client-name">Tariq Malik</div>
+              <span class="status-pill active" id="modal-client-admission-status">Active (Ends Apr 18, 2025)</span>
+              <span class="card-fee-strip due" id="modal-client-dues-badge" style="padding: 0.2rem 0.6rem; font-size: 0.72rem;">Fee status: Due Rs. 3,000</span>
+            </div>
+            <div class="profile-header-sub">
+              Member ID: <b id="modal-client-id">#GF-8841</b> • Register ID: <b id="modal-client-volume">Vol 2 · Pg 48</b> • Enrolled: <span id="modal-client-enrolled">Oct 12, 2023</span> • Total Sessions: <b id="modal-client-sessions-badge">12</b>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-header-nav-group">
+          <button class="btn-nav-client" onclick="app.navigateClient(-1)">
+            <span>‹</span> <span>Prev Member</span>
+          </button>
+          <button class="btn-nav-client" onclick="app.navigateClient(1)">
+            <span>Next Member</span> <span>›</span>
+          </button>
+          <button class="btn-modal-close" onclick="app.closeMeasurementWindow()">✕</button>
+        </div>
+      </div>
+
+      <!-- Subtabs Bar -->
+      <div class="profile-subtabs-bar">
+        <div class="profile-subtabs-left">
+          <div class="profile-subtab-btn active" id="subtab-btn-measurements" onclick="app.switchClientSubtab('measurements')">
+            Measurements &amp; Trends
+          </div>
+          <div class="profile-subtab-btn" id="subtab-btn-accounts" onclick="app.switchClientSubtab('accounts')">
+            Accounts &amp; Receipts
+          </div>
+          <div class="profile-subtab-btn" id="subtab-btn-attendance" onclick="app.switchClientSubtab('attendance')">
+            Attendance Log
+          </div>
+        </div>
+        <div>
+          <button class="btn-card-action btn-card-profile" onclick="app.downloadMasterCSV()" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;">
+            <span>📥 Export CSV</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- SUBTAB 1: MEASUREMENTS CONTENT (IMAGE 1) -->
+      <div class="profile-modal-body" id="client-subtab-measurements-content">
+        
+        <!-- Physical Metrics Overview Header & 8 KPI Cards -->
+        <div>
+          <div class="metrics-overview-header">
+            <div class="metrics-overview-title">
+              <span>Physical Metrics Overview</span>
+              <span class="metrics-overview-badge" id="modal-metrics-checkpoint-hint">Baseline: Enrolled → Latest: Session</span>
+            </div>
+            <span style="font-size: 0.72rem; color: var(--text-muted); font-style: italic;">Strict 0.1 decimal resolution</span>
+          </div>
+
+          <!-- 8 Cards Grid (Image 1) -->
+          <div class="metrics-8-cards-grid">
+            <!-- 1. Weight -->
+            <div class="metric-kpi-card">
+              <span class="metric-kpi-label">WEIGHT</span>
+              <div class="metric-kpi-value"><span id="kpi-latest-weight">--</span> <span>kg</span></div>
+              <div class="metric-kpi-base-row">
+                <span>Base: <b id="kpi-base-weight">--</b></span>
+                <span class="metric-kpi-delta-pill loss" id="kpi-weight-change-badge">0.0 kg</span>
+              </div>
+            </div>
+
+            <!-- 2. Waist -->
+            <div class="metric-kpi-card">
+              <span class="metric-kpi-label">WAIST</span>
+              <div class="metric-kpi-value"><span id="kpi-latest-waist">--</span> <span>in</span></div>
+              <div class="metric-kpi-base-row">
+                <span>Base: <b id="kpi-base-waist">--</b></span>
+                <span class="metric-kpi-delta-pill loss" id="kpi-waist-change-badge">0.0 in</span>
+              </div>
+            </div>
+
+            <!-- 3. Lower Waist -->
+            <div class="metric-kpi-card">
+              <span class="metric-kpi-label">LOWER WAIST</span>
+              <div class="metric-kpi-value"><span id="kpi-latest-lowwaist">--</span> <span>in</span></div>
+              <div class="metric-kpi-base-row">
+                <span>Base: <b id="kpi-base-lowwaist">--</b></span>
+                <span class="metric-kpi-delta-pill loss" id="kpi-lowwaist-change-badge">0.0 in</span>
+              </div>
+            </div>
+
+            <!-- 4. Hip -->
+            <div class="metric-kpi-card">
+              <span class="metric-kpi-label">HIP</span>
+              <div class="metric-kpi-value"><span id="kpi-latest-hip">--</span> <span>in</span></div>
+              <div class="metric-kpi-base-row">
+                <span>Base: <b id="kpi-base-hip">--</b></span>
+                <span class="metric-kpi-delta-pill loss" id="kpi-hip-change-badge">0.0 in</span>
+              </div>
+            </div>
+
+            <!-- 5. Arm -->
+            <div class="metric-kpi-card">
+              <span class="metric-kpi-label">ARM</span>
+              <div class="metric-kpi-value"><span id="kpi-latest-arm">--</span> <span>in</span></div>
+              <div class="metric-kpi-base-row">
+                <span>Base: <b id="kpi-base-arm">--</b></span>
+                <span class="metric-kpi-delta-pill blue" id="kpi-arm-change-badge">0.0 in</span>
+              </div>
+            </div>
+
+            <!-- 6. Chest -->
+            <div class="metric-kpi-card">
+              <span class="metric-kpi-label">CHEST</span>
+              <div class="metric-kpi-value"><span id="kpi-latest-chest">--</span> <span>in</span></div>
+              <div class="metric-kpi-base-row">
+                <span>Base: <b id="kpi-base-chest">--</b></span>
+                <span class="metric-kpi-delta-pill blue" id="kpi-chest-change-badge">0.0 in</span>
+              </div>
+            </div>
+
+            <!-- 7. Thigh -->
+            <div class="metric-kpi-card">
+              <span class="metric-kpi-label">THIGH</span>
+              <div class="metric-kpi-value"><span id="kpi-latest-thigh">--</span> <span>in</span></div>
+              <div class="metric-kpi-base-row">
+                <span>Base: <b id="kpi-base-thigh">--</b></span>
+                <span class="metric-kpi-delta-pill loss" id="kpi-thigh-change-badge">0.0 in</span>
+              </div>
+            </div>
+
+            <!-- 8. Calves -->
+            <div class="metric-kpi-card">
+              <span class="metric-kpi-label">CALVES</span>
+              <div class="metric-kpi-value"><span id="kpi-latest-calves">--</span> <span>in</span></div>
+              <div class="metric-kpi-base-row">
+                <span>Base: <b id="kpi-calves-status">--</b></span>
+                <span class="metric-kpi-delta-pill blue" id="kpi-calves-change-badge">0.0 in</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Middle Split: Chart vs Log Session Form (Image 1) -->
+        <div class="profile-middle-split">
+          
+          <!-- Left: Longitudinal Trajectory Chart -->
+          <div class="trajectory-chart-card">
+            <div class="trajectory-chart-top">
+              <div class="trajectory-title">
+                <h4>Longitudinal Trajectory</h4>
+                <p id="chart-trajectory-subtitle">Descent progress from baseline</p>
+              </div>
+              <div class="chart-pills-toggle">
+                <button class="chart-pill-btn active" id="pill-chart-weight" onclick="app.setChartMode('weight')">Weight</button>
+                <button class="chart-pill-btn" id="pill-chart-waist-hip" onclick="app.setChartMode('waist_hip')">Waist &amp; Hip</button>
+                <button class="chart-pill-btn" id="pill-chart-all" onclick="app.setChartMode('all')">All Metrics</button>
+              </div>
+            </div>
+
+            <!-- SVG Container -->
+            <div class="trajectory-svg-container" id="chart-svg-container"></div>
+
+            <!-- Chart Footer Stats -->
+            <div class="trajectory-stats-footer">
+              <div><span style="color: var(--brand-blue); font-weight: 700;">●</span> Net Weight Change: <b id="chart-net-weight-loss">0.0 kg</b></div>
+              <div><span style="color: var(--accent-success); font-weight: 700;">●</span> Tracked sessions logged</div>
+            </div>
+          </div>
+
+          <!-- Right: Log Session Fast Form (Image 1) -->
+          <div class="log-session-card" id="add-session-section">
+            <form onsubmit="app.handleSaveNewSession(event)">
+              <div class="log-session-top">
+                <div class="log-session-title">
+                  <span>📝</span>
+                  <span id="new-session-title-label">Log Session</span>
+                  <small id="new-session-number-hint" style="color: var(--text-muted); font-size: 0.72rem; font-weight: 600;">(#1)</small>
+                </div>
+                <button type="button" class="btn-copy-prev" onclick="app.copyPreviousSessionValues()" title="Pre-fill last recorded measurements">
+                  <span>⚡</span>
+                  <span>Copy Previous Values</span>
+                </button>
+              </div>
+
+              <!-- Date & Live Delta Preview -->
+              <div class="session-date-row" style="margin-top: 0.75rem; margin-bottom: 0.75rem;">
+                <input type="date" id="form-session-date" required>
+                <div class="live-delta-badge" id="form-delta-badge">0.0 kg this session</div>
+              </div>
+
+              <!-- 4x2 Metric Input Grid (Step 0.1) -->
+              <div class="metric-inputs-grid-4x2">
+                <div class="metric-input-item">
+                  <label>Weight (kg) *</label>
+                  <input type="number" step="0.1" id="form-session-weight" placeholder="e.g. 74.0" required oninput="app.calculateLiveWeightDelta()">
+                </div>
+                <div class="metric-input-item">
+                  <label>Waist (in)</label>
+                  <input type="number" step="0.1" id="form-session-waist" placeholder="e.g. 32.0">
+                </div>
+                <div class="metric-input-item">
+                  <label>L. Waist (in)</label>
+                  <input type="number" step="0.1" id="form-session-lowwaist" placeholder="e.g. 33.5">
+                </div>
+                <div class="metric-input-item">
+                  <label>Hip (in)</label>
+                  <input type="number" step="0.1" id="form-session-hip" placeholder="e.g. 38.0">
+                </div>
+
+                <div class="metric-input-item">
+                  <label>Arm (in)</label>
+                  <input type="number" step="0.1" id="form-session-arm" placeholder="e.g. 15.0">
+                </div>
+                <div class="metric-input-item">
+                  <label>Chest (in)</label>
+                  <input type="number" step="0.1" id="form-session-chest" placeholder="e.g. 42.0">
+                </div>
+                <div class="metric-input-item">
+                  <label>Thigh (in)</label>
+                  <input type="number" step="0.1" id="form-session-thigh" placeholder="e.g. 22.0">
+                </div>
+                <div class="metric-input-item">
+                  <label>Calves (in)</label>
+                  <input type="number" step="0.1" id="form-session-calves" placeholder="e.g. 15.2">
+                </div>
+              </div>
+
+              <!-- Trainer Remarks Textarea -->
+              <div style="margin-top: 0.75rem; margin-bottom: 0.85rem;">
+                <label style="font-size: 0.68rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">TRAINER REMARKS</label>
+                <textarea id="form-session-notes" class="remarks-textarea" placeholder="Notes, hypertrophy, diet compliance, recovery..."></textarea>
+              </div>
+
+              <!-- Submit Button -->
+              <button type="submit" class="btn-save-session" style="width: 100%;">
+                <span>💾</span>
+                <span>Save Session [Enter]</span>
+              </button>
+            </form>
+          </div>
+
+        </div>
+
+        <!-- Longitudinal Session History Table (Image 1 Bottom) -->
+        <div class="history-table-card">
+          <div class="history-table-header">
+            <div>
+              <h4 style="font-size: 1rem; font-weight: 800; color: var(--text-main);">
+                Longitudinal Session History
+                <span class="content-tab-badge" id="history-sessions-count">0</span>
+              </h4>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <input type="text" placeholder="Filter notes or session..." class="form-control" style="font-size: 0.78rem; padding: 0.35rem 0.65rem;" oninput="app.filterSessionHistoryTable(this.value)">
+              <button class="header-icon-btn" onclick="window.print()" title="Print Session History" style="width: 32px; height: 32px; font-size: 0.85rem;">🖨️</button>
+            </div>
+          </div>
+
+          <div style="overflow-x: auto;">
+            <table class="modern-table">
+              <thead>
+                <tr>
+                  <th>Session #</th>
+                  <th>Date</th>
+                  <th>Weight (kg)</th>
+                  <th>Waist</th>
+                  <th>L. Waist</th>
+                  <th>Hip</th>
+                  <th>Arm</th>
+                  <th>Chest</th>
+                  <th>Thigh</th>
+                  <th>Calves</th>
+                  <th>Net Delta</th>
+                  <th>Trainer Notes</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="modal-sessions-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SUBTAB 2: CLIENT ACCOUNTS WINDOW -->
+      <div class="profile-modal-body" id="client-subtab-accounts-content" style="display: none;">
+        <div class="kpi-cards-grid-4">
+          <div class="kpi-stat-card">
+            <span class="kpi-stat-label">3-Month Expiry Date</span>
+            <div class="kpi-stat-value" id="client-acc-expiry-date" style="font-size: 1.15rem;">--</div>
+            <span class="status-pill active" id="client-acc-status-badge">Active</span>
+          </div>
+          <div class="kpi-stat-card">
+            <span class="kpi-stat-label">Outstanding Dues</span>
+            <div class="kpi-stat-value red" id="client-acc-dues">Rs. 0</div>
+            <span style="font-size: 0.72rem;" id="client-acc-dues-status">Clear</span>
+          </div>
+          <div class="kpi-stat-card">
+            <span class="kpi-stat-label">Monthly Rate</span>
+            <div class="kpi-stat-value" id="client-acc-monthly-rate" style="font-size: 1.15rem;">Rs. 3,000</div>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">Per Calendar Month</span>
+          </div>
+          <div class="kpi-stat-card">
+            <span class="kpi-stat-label">Total Paid (Lifetime)</span>
+            <div class="kpi-stat-value" id="client-acc-total-collected" style="font-size: 1.15rem;">Rs. 0</div>
+            <span style="font-size: 0.72rem; color: var(--text-muted);" id="client-acc-payment-count">0 receipts</span>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem; margin-bottom: 1rem;">
+          <button class="btn-sidebar-quick" style="width: auto;" onclick="app.openCollectFeeModalForCurrentClient()">
+            <span>💰</span> <span>Record Fee Payment for Client</span>
+          </button>
+          <button class="btn-card-action btn-card-profile" onclick="app.renewAdmission3Months()">
+            <span>🔄</span> <span>Renew 3-Month Validity (+3 Mo)</span>
+          </button>
+        </div>
+
+        <div class="ledger-card-panel">
+          <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.75rem;">Payment Receipts History</h4>
+          <table class="modern-table">
+            <thead>
+              <tr>
+                <th>Receipt #</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Amount Paid</th>
+                <th>Dues Remaining</th>
+                <th>Method</th>
+                <th>Period</th>
+                <th>Notes</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="client-payments-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SUBTAB 3: CLIENT ATTENDANCE WINDOW -->
+      <div class="profile-modal-body" id="client-subtab-attendance-content" style="display: none;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+          <div id="client-att-summary-text" style="font-weight: 700; color: var(--text-main);">Total Visits: 0</div>
+          <button class="btn-sidebar-quick" style="width: auto;" onclick="app.checkinCurrentClient()">
+            <span>✅</span> <span>Check-In Member Today</span>
+          </button>
+        </div>
+
+        <div class="ledger-card-panel">
+          <table class="modern-table">
+            <thead>
+              <tr>
+                <th>Visit #</th>
+                <th>Date</th>
+                <th>Check-In Time</th>
+                <th>Status</th>
+                <th>Notes</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="client-attendance-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================
+       MODALS: ADD MEMBER, COLLECT FEE, BACKUP, INSTALL, SPOTLIGHT
+       ======================================================== -->
+
+  <!-- 1. ADD NEW MEMBER MODAL -->
+  <div class="modal-overlay" id="add-client-modal-overlay">
+    <div class="standard-modal" style="max-width: 620px;">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <div class="sidebar-brand-icon" style="width: 34px; height: 34px; font-size: 1rem;">➕</div>
+          <div>
+            <h3 style="font-size: 1.05rem; font-weight: 800;">Add New Member</h3>
+            <p style="font-size: 0.72rem; color: var(--text-muted);">Enroll with 3-Month Admission &amp; Baseline Measurements</p>
+          </div>
+        </div>
+        <button class="btn-modal-close" onclick="app.closeAddClientModal()">✕</button>
+      </div>
+
+      <form id="add-client-form" onsubmit="app.handleCreateClient(event)" style="padding: 1.25rem;">
+        <div class="amount-inputs-grid">
+          <div class="form-group">
+            <label>Member Full Name *</label>
+            <input type="text" class="form-control" id="new-client-name" placeholder="e.g. Tariq Malik" required>
+          </div>
+          <div class="form-group">
+            <label>Register Volume / Book</label>
+            <select class="form-control" id="new-client-volume">
+              <option value="Vol 1 (2016-2025)">Vol 1 (2016-2025)</option>
+              <option value="Vol 2 (2016-2024)" selected>Vol 2 (2016-2024)</option>
+              <option value="Vol 3 (2016-2021)">Vol 3 (2016-2021)</option>
+              <option value="Vol 4 (2014-2016)">Vol 4 (2014-2016)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="amount-inputs-grid">
+          <div class="form-group">
+            <label>Register Page #</label>
+            <input type="text" class="form-control" id="new-client-page" placeholder="e.g. 48">
+          </div>
+          <div class="form-group">
+            <label>Enrollment Date</label>
+            <input type="date" class="form-control" id="new-client-date" required>
+          </div>
+        </div>
+
+        <div class="amount-inputs-grid">
+          <div class="form-group">
+            <label>Admission Fee (Rs)</label>
+            <input type="number" class="form-control" id="new-client-admission-fee" value="2000" step="100">
+          </div>
+          <div class="form-group">
+            <label>Monthly Fee Rate (Rs)</label>
+            <input type="number" class="form-control" id="new-client-monthly-fee" value="3000" step="100">
+          </div>
+        </div>
+
+        <!-- Baseline Measurements -->
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--brand-blue); text-transform: uppercase; margin-top: 0.5rem; margin-bottom: 0.5rem;">
+          Baseline Body Measurements (Step 0.1)
+        </div>
+
+        <div class="metric-inputs-grid-4x2">
+          <div class="metric-input-item">
+            <label>Weight (kg) *</label>
+            <input type="number" step="0.1" class="form-control" id="new-client-weight" placeholder="e.g. 82.5" required>
+          </div>
+          <div class="metric-input-item">
+            <label>Waist (in)</label>
+            <input type="number" step="0.1" class="form-control" id="new-client-waist" placeholder="e.g. 36.4">
+          </div>
+          <div class="metric-input-item">
+            <label>L. Waist (in)</label>
+            <input type="number" step="0.1" class="form-control" id="new-client-lowwaist" placeholder="e.g. 37.8">
+          </div>
+          <div class="metric-input-item">
+            <label>Hip (in)</label>
+            <input type="number" step="0.1" class="form-control" id="new-client-hip" placeholder="e.g. 41.2">
+          </div>
+          <div class="metric-input-item">
+            <label>Arm (in)</label>
+            <input type="number" step="0.1" class="form-control" id="new-client-arm" placeholder="e.g. 14.2">
+          </div>
+          <div class="metric-input-item">
+            <label>Chest (in)</label>
+            <input type="number" step="0.1" class="form-control" id="new-client-chest" placeholder="e.g. 40.5">
+          </div>
+          <div class="metric-input-item">
+            <label>Thigh (in)</label>
+            <input type="number" step="0.1" class="form-control" id="new-client-thigh" placeholder="e.g. 23.4">
+          </div>
+          <div class="metric-input-item">
+            <label>Calves (in)</label>
+            <input type="number" step="0.1" class="form-control" id="new-client-calves" placeholder="e.g. 15.0">
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 0.75rem;">
+          <label>Notes / Baseline Health Assessment</label>
+          <input type="text" class="form-control" id="new-client-notes" placeholder="e.g. Initial enrolment assessment">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem;">
+          <button type="button" class="btn-card-action btn-card-profile" onclick="app.closeAddClientModal()">Cancel</button>
+          <button type="submit" class="btn-sidebar-quick" style="width: auto;">Enroll Member</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. SPOTLIGHT COMMAND PALETTE (CTRL+K / /) -->
+  <div class="modal-overlay" id="spotlight-modal-overlay" onclick="app.handleSpotlightOverlayClick(event)">
+    <div class="spotlight-modal">
+      <div class="spotlight-search-header">
+        <span>🔍</span>
+        <input type="text" id="spotlight-input" placeholder="Type a client name or volume to jump immediately..." oninput="app.handleSpotlightInput(this.value)" onkeydown="app.handleSpotlightKeydown(event)">
+        <span style="font-size: 0.68rem; background: #e2e8f0; padding: 0.15rem 0.4rem; border-radius: 4px; color: var(--text-muted);">Esc</span>
+      </div>
+      <div class="spotlight-results" id="spotlight-results"></div>
+      <div class="spotlight-footer">
+        <span>Use <b>↑</b> <b>↓</b> keys to navigate, <b>Enter</b> to jump</span>
+        <span id="spotlight-match-count">119 clients ready</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. QUICK CHECK-IN MODAL -->
+  <div class="modal-overlay" id="quick-checkin-modal-overlay">
+    <div class="standard-modal" style="max-width: 520px;">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <div class="sidebar-brand-icon" style="width: 34px; height: 34px; font-size: 1rem;">⚡</div>
+          <div>
+            <h3 style="font-size: 1.05rem; font-weight: 800;">Quick Daily Check-In</h3>
+            <p style="font-size: 0.72rem; color: var(--text-muted);">Click any member to mark them present today</p>
+          </div>
+        </div>
+        <button class="btn-modal-close" onclick="app.closeQuickCheckinModal()">✕</button>
+      </div>
+      <div style="padding: 1.25rem;">
+        <div class="form-group">
+          <input type="text" class="form-control" id="quick-checkin-search" placeholder="Type name to filter..." oninput="app.filterCheckinList(this.value)">
+        </div>
+        <div style="max-height: 280px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.35rem;" id="quick-checkin-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. INSTALL APP MODAL -->
+  <div class="modal-overlay" id="install-modal-overlay" onclick="app.handleInstallOverlayClick(event)">
+    <div class="standard-modal" style="max-width: 540px;">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <div class="sidebar-brand-icon" style="width: 36px; height: 36px; font-size: 1rem; background: linear-gradient(135deg, #8b5cf6, #d946ef);">📲</div>
+          <div>
+            <h3 style="font-size: 1.05rem; font-weight: 800;">Install GymFit Pro</h3>
+            <p style="font-size: 0.72rem; color: var(--text-muted);">Run as a standalone desktop app — 100% offline</p>
+          </div>
+        </div>
+        <button class="btn-modal-close" onclick="app.closeInstallModal()">✕</button>
+      </div>
+
+      <div style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
+        <!-- DIRECT NATIVE PWA TRIGGER -->
+        <div id="install-native-prompt-box" style="display: none; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: var(--radius-md); padding: 1.25rem; text-align: center;">
+          <h4 style="font-size: 1rem; font-weight: 800; color: var(--brand-blue); margin-bottom: 0.35rem;">⚡ Browser Installation Ready!</h4>
+          <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1rem;">Click below to directly install GymFit Pro onto your Chromebook or Windows device with zero setup.</p>
+          <button class="btn-sidebar-quick" style="width: auto; margin: 0 auto; padding: 0.65rem 1.5rem; background: var(--brand-blue); color: #fff; font-weight: 800; font-size: 0.9rem;" onclick="app.triggerNativeInstall()">
+            <span>📲</span> <span>Direct 1-Click Install Now</span>
+          </button>
+        </div>
+
+        <!-- LOCAL WEB APP MODE (ENABLES 1-CLICK PWA) -->
+        <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+            <div style="font-weight: 800; font-size: 0.92rem; color: var(--brand-blue); display: flex; align-items: center; gap: 0.4rem;">
+              <span>🌐</span> <span>Local Web App Mode</span>
+            </div>
+            <span class="header-chip green" style="padding: 0.2rem 0.6rem; font-size: 0.7rem;">
+              <span class="header-chip-dot"></span> Port 8080 Active
+            </span>
+          </div>
+          <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.85rem; line-height: 1.5;">
+            Chrome & Chromebook enable the native 1-click install button when running from the local web server.
+          </p>
+          <button class="btn-card-action btn-card-profile" style="width: 100%; justify-content: center; padding: 0.65rem;" onclick="app.openLocalhostInstallMode()">
+            <span>🚀</span> <span>Switch to Local Web App (http://localhost:8080)</span>
+          </button>
+        </div>
+
+        <!-- DIRECT STANDALONE APP WINDOW -->
+        <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem;">
+          <div style="font-weight: 800; font-size: 0.92rem; color: var(--text-main); margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.4rem;">
+            <span>💻</span> <span>Direct Desktop Window (App Mode)</span>
+          </div>
+          <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.85rem; line-height: 1.5;">
+            Launches GymFit Pro in a dedicated borderless window with zero browser tabs or toolbars.
+          </p>
+          <button class="btn-card-action" style="width: 100%; justify-content: center; padding: 0.65rem;" onclick="app.triggerNativeInstall()">
+            <span>⚡</span> <span>Trigger Browser Install Prompt</span>
+          </button>
+        </div>
+
+        <div style="text-align: right;">
+          <button class="btn-card-action btn-card-profile" onclick="app.closeInstallModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. BACKUP & SETTINGS MODAL -->
+  <div class="modal-overlay" id="backup-modal-overlay">
+    <div class="standard-modal" style="max-width: 540px;">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <div class="sidebar-brand-icon" style="width: 36px; height: 36px; font-size: 1rem;">⚙️</div>
+          <div>
+            <h3 style="font-size: 1.05rem; font-weight: 800;">Data Management &amp; Backups</h3>
+            <p style="font-size: 0.72rem; color: var(--text-muted);">Automatic local database is active</p>
+          </div>
+        </div>
+        <button class="btn-modal-close" onclick="app.closeBackupModal()">✕</button>
+      </div>
+
+      <div style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
+        <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem;">
+          <div style="font-weight: 800; font-size: 0.88rem; margin-bottom: 0.25rem;">💾 Download Complete Backup (JSON)</div>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.65rem;">Saves all 119 clients, measurements, payments, dues, and attendance to your device.</p>
+          <button class="btn-sidebar-quick" style="width: auto;" onclick="app.downloadJSONBackup()">Export Backup (.json)</button>
+        </div>
+
+        <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem;">
+          <div style="font-weight: 800; font-size: 0.88rem; margin-bottom: 0.25rem;">📥 Restore Backup (JSON)</div>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.65rem;">Restore gym database from a previously saved JSON file.</p>
+          <input type="file" id="backup-file-input" accept=".json" style="display: none;" onchange="app.handleRestoreFile(event)">
+          <button class="btn-card-action btn-card-profile" onclick="document.getElementById('backup-file-input').click()">Select Backup File to Restore</button>
+        </div>
+
+        <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem;">
+          <div style="font-weight: 800; font-size: 0.88rem; margin-bottom: 0.25rem;">📊 Export Master Directory (CSV)</div>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.65rem;">Export summary register of all clients for Excel or Google Sheets.</p>
+          <button class="btn-card-action btn-card-profile" onclick="app.downloadMasterCSV()">Download Directory CSV</button>
+        </div>
+
+        <div style="border-top: 1px solid var(--border-color); padding-top: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 0.75rem; color: var(--text-dim);">Reset to initial 119 clients:</span>
+          <button class="btn-card-action btn-card-collect" style="padding: 0.35rem 0.65rem; font-size: 0.72rem;" onclick="app.resetToInitialDataset()">Reset to Defaults</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. FIREBASE CLOUD DATABASE MODAL -->
+  <div class="modal-overlay" id="firebase-modal-overlay" onclick="app.handleFirebaseOverlayClick(event)">
+    <div class="standard-modal" style="max-width: 620px;">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <div class="sidebar-brand-icon" style="width: 36px; height: 36px; font-size: 1.1rem; background: #ea580c;">🔥</div>
+          <div>
+            <h3 style="font-size: 1.05rem; font-weight: 800;">Firebase Cloud Database</h3>
+            <p style="font-size: 0.72rem; color: var(--text-muted);">Real-time multi-device sync for GitHub Pages &amp; Chromebooks</p>
+          </div>
+        </div>
+        <button class="btn-modal-close" onclick="app.closeFirebaseModal()">✕</button>
+      </div>
+
+      <div style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1.1rem; max-height: 80vh; overflow-y: auto;">
+        
+        <!-- Live Connection Status Box -->
+        <div id="firebase-status-banner" style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem; display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 0.65rem;">
+            <div id="firebase-status-dot" style="width: 10px; height: 10px; border-radius: 50%; background: #94a3b8;"></div>
+            <div>
+              <div id="firebase-status-heading" style="font-weight: 800; font-size: 0.88rem; color: var(--text-main);">Checking connection...</div>
+              <div id="firebase-status-sub" style="font-size: 0.74rem; color: var(--text-muted);">Local mode active</div>
+            </div>
+          </div>
+          <button class="btn-card-action btn-card-profile" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;" onclick="app.testFirebaseConnection()">
+            🔄 Test Connection
+          </button>
+        </div>
+
+        <!-- 1-Click Initial Seed / Sync Box -->
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-md); padding: 1rem;">
+          <div style="font-weight: 800; font-size: 0.88rem; color: #166534; margin-bottom: 0.25rem;">
+            ☁️ Initial Cloud Data Push (119 Members)
+          </div>
+          <p style="font-size: 0.78rem; color: #15803d; margin-bottom: 0.75rem; line-height: 1.4;">
+            Upload all 119 clients and 935 sessions from your local database directly into Firebase Firestore. Once uploaded, any Chromebook or computer with the link will see the data in real time.
+          </p>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button class="btn-sidebar-quick" style="width: auto; background: #16a34a; font-size: 0.8rem; padding: 0.45rem 0.95rem;" onclick="app.uploadLocalToFirebase()">
+              <span>☁️</span> <span>Upload 119 Members to Firebase</span>
+            </button>
+            <button class="btn-card-action btn-card-profile" style="width: auto; font-size: 0.8rem; padding: 0.45rem 0.95rem;" onclick="app.pullFromFirebase()">
+              <span>⬇️</span> <span>Pull Cloud Data to Local</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Paste Config Box -->
+        <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem;">
+          <div style="font-weight: 800; font-size: 0.88rem; color: var(--text-main); margin-bottom: 0.25rem;">
+            ⚙️ Firebase Project Credentials
+          </div>
+          <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.65rem;">
+            Paste the <code>firebaseConfig</code> object from your Firebase Console (Project Settings &gt; General &gt; Your apps), or enter credentials below.
+          </p>
+
+          <div style="margin-bottom: 0.75rem;">
+            <label style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Quick Paste Firebase Config Code / JSON</label>
+            <textarea id="firebase-raw-config-input" class="remarks-textarea" placeholder="const firebaseConfig = { apiKey: '...', projectId: '...', ... };" style="font-family: monospace; font-size: 0.75rem; min-height: 70px;"></textarea>
+            <button class="btn-card-action btn-card-profile" style="margin-top: 0.35rem; padding: 0.3rem 0.65rem; font-size: 0.72rem;" onclick="app.parseAndApplyRawConfig()">
+              Auto-Fill Credentials Below
+            </button>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+            <div class="input-field-group">
+              <label>Project ID *</label>
+              <input type="text" id="fb-input-projectId" placeholder="my-gym-app">
+            </div>
+            <div class="input-field-group">
+              <label>API Key *</label>
+              <input type="text" id="fb-input-apiKey" placeholder="AIzaSy...">
+            </div>
+            <div class="input-field-group">
+              <label>Auth Domain</label>
+              <input type="text" id="fb-input-authDomain" placeholder="my-gym-app.firebaseapp.com">
+            </div>
+            <div class="input-field-group">
+              <label>Storage Bucket</label>
+              <input type="text" id="fb-input-storageBucket" placeholder="my-gym-app.appspot.com">
+            </div>
+            <div class="input-field-group">
+              <label>Messaging Sender ID</label>
+              <input type="text" id="fb-input-messagingSenderId" placeholder="1234567890">
+            </div>
+            <div class="input-field-group">
+              <label>App ID</label>
+              <input type="text" id="fb-input-appId" placeholder="1:123456:web:abc">
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+            <button class="btn-attendance-large" style="width: auto; padding: 0.5rem 1.25rem; font-size: 0.82rem;" onclick="app.saveFirebaseConfigFromInputs()">
+              <span>💾 Save &amp; Connect to Firebase</span>
+            </button>
+            <button class="btn-card-action btn-card-profile" style="width: auto; padding: 0.5rem 1rem; font-size: 0.82rem;" onclick="app.clearFirebaseConfig()">
+              Clear Credentials
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Setup Help -->
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--radius-md); padding: 0.85rem; font-size: 0.76rem; color: #1e40af; line-height: 1.5;">
+          <strong>Quick Setup (Free):</strong><br>
+          1. Go to <a href="https://console.firebase.google.com/" target="_blank" style="color: var(--brand-blue); font-weight: 700;">console.firebase.google.com</a> &rarr; Add project.<br>
+          2. Click <b>Web (&lt;/&gt;)</b> icon to register an app &rarr; Copy the config keys.<br>
+          3. Go to <b>Build &rarr; Firestore Database</b> &rarr; Create database &rarr; Start in <b>Test Mode</b>.<br>
+          4. Click <b>"Upload 119 Members to Firebase"</b> above. Done!
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Google Firebase Cloud SDK (Official CDN) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+
+  <!-- App Engine Scripts -->
+  <script src="gym_data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
